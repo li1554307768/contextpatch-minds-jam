@@ -1,0 +1,29 @@
+{
+  "dataset_label": "SYNTHETIC_DEMO_ONLY",
+  "description": "Fictional creator and fictional content. No real claims, accounts, audience, or revenue.",
+  "source": {
+    "title": "Avery's Creator Systems launch note",
+    "body": "The Creator Systems workshop opens on September 30. The live cohort includes six sessions and costs $149. Recordings remain available for 12 months.",
+    "synthetic": true
+  },
+  "versions": [
+    {
+      "platform": "X",
+      "external_ref": "synthetic-x-001",
+      "content": "Creator Systems opens September 30: six live sessions for $149, with 12-month recording access.",
+      "fact_keys": ["launch_date", "session_count", "price", "recording_access"]
+    },
+    {
+      "platform": "LinkedIn",
+      "external_ref": "synthetic-linkedin-001",
+      "content": "I'm launching Creator Systems on September 30. The $149 cohort combines six live sessions with recordings available for 12 months.",
+      "fact_keys": ["launch_date", "session_count", "price", "recording_access"]
+    },
+    {
+      "platform": "YouTube",
+      "external_ref": "synthetic-youtube-001",
+      "content": "Description: Join Creator Systems when it opens September 30. Six sessions, $149, and recordings for 12 months.",
+      "fact_keys": ["launch_date", "session_count", "price", "recording_access"]
+    }
+  ]
+}
