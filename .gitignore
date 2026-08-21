@@ -1,0 +1,14 @@
+.env
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+__pycache__/
+*.py[cod]
+data/*.db
+data/*.db-*
+htmlcov/
+.coverage
+dist/
+output/demo-video/
+output/*.json
