@@ -1,0 +1,59 @@
+{
+  "dataset_label": "SYNTHETIC_DEMO_ONLY",
+  "description": "Fictional creator, offer and platform copies. No real audience, publication, customer or revenue.",
+  "creator": {
+    "display_name": "Avery Chen",
+    "synthetic": true,
+    "correction_style": "Make the correction visible, name the old and new date, preserve the surrounding platform context, and never silently edit."
+  },
+  "source": {
+    "external_ref": "synthetic-source-001",
+    "title": "Creator Systems workshop",
+    "fact_change": {
+      "fact_key": "launch_date",
+      "old_fact": "September 30",
+      "new_fact": "October 7"
+    },
+    "unchanged_context": {
+      "price": "$149",
+      "session_count": "six live sessions",
+      "recording_access": "12 months"
+    },
+    "synthetic": true
+  },
+  "approved_correction_principle": "Publish a visible correction that names September 30 and October 7, preserve every other approved fact and the platform's context, never silently edit, and never publish without human approval.",
+  "versions": [
+    {
+      "platform": "X",
+      "external_ref": "synthetic-x-001",
+      "content": "Creator Systems opens September 30: six live sessions for $149, with 12-month recording access.",
+      "fact_keys": ["launch_date"],
+      "synthetic": true
+    },
+    {
+      "platform": "LinkedIn",
+      "external_ref": "synthetic-linkedin-001",
+      "content": "I'm launching Creator Systems on September 30. The $149 cohort combines six live sessions with recordings available for 12 months.",
+      "fact_keys": ["launch_date"],
+      "synthetic": true
+    },
+    {
+      "platform": "YouTube",
+      "external_ref": "synthetic-youtube-001",
+      "content": "Description: Join Creator Systems when it opens September 30. Six sessions, $149, and recordings for 12 months.",
+      "fact_keys": ["launch_date"],
+      "synthetic": true
+    }
+  ],
+  "expected_platform_patches": {
+    "x": "Correction: Creator Systems opens October 7, not September 30. It remains six live sessions for $149, with 12-month recording access.",
+    "linkedin": "Correction to my launch announcement: Creator Systems now begins October 7, not September 30. The $149 cohort still includes six live sessions and 12 months of recording access.",
+    "youtube": "Update: Creator Systems opens October 7, not September 30. Six sessions, $149, and recordings remain available for 12 months."
+  },
+  "automation_boundary": {
+    "auto_publish": false,
+    "requires_fact_approval": true,
+    "requires_draft_approval": true,
+    "pause_blocks_follow_up": true
+  }
+}
