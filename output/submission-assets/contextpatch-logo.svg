@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480" role="img" aria-labelledby="title desc">
+  <title id="title">ContextPatch logo</title>
+  <desc id="desc">Three content cards connected by a bright correction patch.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#111936"/>
+      <stop offset="1" stop-color="#07101f"/>
+    </linearGradient>
+    <linearGradient id="patch" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#42e8d5"/>
+      <stop offset="1" stop-color="#7b7dff"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="480" height="480" rx="96" fill="url(#bg)"/>
+  <circle cx="240" cy="240" r="162" fill="none" stroke="#233154" stroke-width="2"/>
+  <g fill="#172441" stroke="#4b5f88" stroke-width="4">
+    <rect x="94" y="116" width="220" height="88" rx="22"/>
+    <rect x="166" y="196" width="220" height="88" rx="22"/>
+    <rect x="94" y="276" width="220" height="88" rx="22"/>
+  </g>
+  <g stroke="#8394ba" stroke-width="8" stroke-linecap="round">
+    <path d="M126 148h88M126 174h142"/>
+    <path d="M198 228h88M198 254h142"/>
+    <path d="M126 308h88M126 334h142"/>
+  </g>
+  <g filter="url(#glow)">
+    <rect x="269" y="159" width="118" height="150" rx="30" fill="url(#patch)" transform="rotate(8 328 234)"/>
+    <path d="M297 236l21 22 46-57" fill="none" stroke="#07101f" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="240" y="420" text-anchor="middle" fill="#f5f7ff" font-family="Arial, Helvetica, sans-serif" font-size="38" font-weight="700" letter-spacing="1">ContextPatch</text>
+</svg>
