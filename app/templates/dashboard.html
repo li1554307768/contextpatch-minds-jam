@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ContextPatch</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+</head>
+<body>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">CREATOR CORRECTION CONTROL PLANE</p>
+      <h1>ContextPatch</h1>
+      <p>一个事实变了，确定性找出 X、LinkedIn、YouTube 中所有受影响版本。</p>
+    </div>
+    <div class="safety">
+      <strong>{{ "PAUSED" if state.paused else "ACTIVE" }}</strong>
+      <span>Auto-publish: OFF</span>
+      <form method="post" action="/pause">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="paused" value="{{ 0 if state.paused else 1 }}">
+        <button class="{{ 'primary' if state.paused else 'danger' }}">
+          {{ "Resume" if state.paused else "Pause / Kill switch" }}
+        </button>
+      </form>
+    </div>
+  </header>
+
+  <main>
+    {% if notice %}<div class="notice">{{ notice }}</div>{% endif %}
+    {% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+    <section class="panel intro">
+      <div>
+        <h2>1. 载入安全演示</h2>
+        <p>数据明确标注为合成角色、合成内容、合成平台引用，不代表真实发布。</p>
+      </div>
+      <form method="post" action="/demo/load">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="primary" {% if state.paused %}disabled{% endif %}>Load synthetic demo</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>2. 录入事实变更</h2>
+      {% if state.sources %}
+      <form method="post" action="/changes" class="grid-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label>Source
+          <select name="source_id" required>
+          {% for source in state.sources %}
+            <option value="{{ source.id }}">#{{ source.id }} {{ source.title }}{% if source.synthetic %} · SYNTHETIC{% endif %}</option>
+          {% endfor %}
+          </select>
+        </label>
+        <label>Fact key
+          <input name="fact_key" value="launch_date" maxlength="100" required>
+        </label>
+        <label>Old fact
+          <input name="old_fact" value="September 30" maxlength="2000" required>
+        </label>
+        <label>New fact
+          <input name="new_fact" value="October 7" maxlength="2000" required>
+        </label>
+        <label class="wide">Approved disclosure principle
+          <input name="disclosure_principle" value="State the correction plainly, preserve the original context, and do not hide the prior error." maxlength="1000" required>
+        </label>
+        <label>Correction due
+          <input type="date" name="due_at" value="{{ default_due }}" required>
+        </label>
+        <button class="primary" {% if state.paused %}disabled{% endif %}>Record & detect impacts</button>
+      </form>
+      {% else %}<p class="empty">先载入合成演示数据。</p>{% endif %}
+    </section>
+
+    <section class="panel">
+      <h2>Source → published versions</h2>
+      <div class="cards">
+      {% for version in state.versions %}
+        <article class="version-card">
+          <span class="platform">{{ version.platform }}</span>
+          <small>{{ version.external_ref }} · SYNTHETIC</small>
+          <p>{{ version.content }}</p>
+        </article>
+      {% else %}<p class="empty">暂无平台版本。</p>{% endfor %}
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>3. 事实变更审批</h2>
+      <div class="stack">
+      {% for change in state.changes %}
+        <article class="row-card">
+          <div>
+            <span class="status {{ change.status|lower }}">{{ change.status }}</span>
+            {% if change.injection_flagged %}<span class="flag">Injection language isolated</span>{% endif %}
+            <h3>{{ change.fact_key }} · {{ change.impact_count }} impacted versions</h3>
+            <p><del>{{ change.old_fact }}</del> → <strong>{{ change.new_fact }}</strong></p>
+            <small>Memory key: {{ change.memory_key }}</small>
+          </div>
+          {% if change.status == 'PENDING_APPROVAL' %}
+          <div class="actions">
+            <form method="post" action="/changes/{{ change.id }}/approve">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button class="primary">Approve fact + principle</button>
+            </form>
+            <form method="post" action="/changes/{{ change.id }}/reject">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button class="secondary">Reject</button>
+            </form>
+          </div>
+          {% endif %}
+        </article>
+      {% else %}<p class="empty">尚未录入变更。</p>{% endfor %}
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>4. Correction queue</h2>
+      <p class="hint">批准只代表草稿通过；ContextPatch 没有平台发帖代码。</p>
+      <div class="stack">
+      {% for item in state.queue %}
+        <article class="queue-card {% if item.overdue %}overdue{% endif %}">
+          <div class="queue-head">
+            <span class="platform">{{ item.platform }}</span>
+            <span class="status {{ item.status|lower }}">{{ item.status }}</span>
+            <span>Due {{ item.due_at }}</span>
+          </div>
+          <p><strong>WHY NOW:</strong> {{ item.why_now }}</p>
+          <p class="original">{{ item.content }}</p>
+          <div class="draft"><strong>{{ item.platform }}-specific correction draft</strong><br>{{ item.draft or "Waiting for a schema-valid Minds recall response." }}</div>
+          {% if item.status == 'PENDING_REVIEW' %}
+          <div class="actions">
+            <form method="post" action="/queue/{{ item.id }}/approve">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button class="primary" {% if not item.draft %}disabled{% endif %}>Approve draft</button>
+            </form>
+            <form method="post" action="/queue/{{ item.id }}/reject">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button class="secondary">Reject</button>
+            </form>
+            <form method="post" action="/queue/{{ item.id }}/follow-up">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button class="ghost">Log WHY NOW follow-up ({{ item.follow_up_count }})</button>
+            </form>
+          </div>
+          {% endif %}
+        </article>
+      {% else %}<p class="empty">队列为空。</p>{% endfor %}
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>5. Minds memory continuity</h2>
+      <p class="hint">{{ "Builder API configured. Every send still needs a click." if minds_configured else "Not configured: packets and strict response validation remain fully testable offline." }}</p>
+      <div class="stack">
+      {% for exchange in state.exchanges %}
+        <article class="exchange">
+          <div class="queue-head">
+            <strong>#{{ exchange.id }} {{ exchange.operation }}</strong>
+            <span class="status {{ exchange.status|lower }}">{{ exchange.status }}</span>
+            <span>new session: {{ exchange.session_alias }}</span>
+          </div>
+          <details>
+            <summary>Inspect isolated request</summary>
+            <pre>{{ exchange.request_body }}</pre>
+          </details>
+          {% if exchange.recalled_principle %}
+          <div class="draft"><strong>Recalled approved principle</strong><br>{{ exchange.recalled_principle }}</div>
+          {% endif %}
+          {% if exchange.timestamp_evidence_limitation %}
+          <p class="hint"><strong>Timestamp evidence limitation:</strong> {{ exchange.timestamp_evidence_limitation }}</p>
+          {% endif %}
+          {% if exchange.status == 'PREPARED' %}
+          <form method="post" action="/minds/{{ exchange.id }}/send">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="secondary" {% if not minds_configured or state.paused %}disabled{% endif %}>Explicitly send to Minds</button>
+          </form>
+          {% endif %}
+          {% if exchange.status in ['SENT', 'UNCERTAIN'] %}
+          <form method="post" action="/minds/{{ exchange.id }}/sync">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="secondary">Check history once</button>
+          </form>
+          {% endif %}
+        </article>
+      {% else %}<p class="empty">批准事实变更后，才会准备 Minds 记忆写入。</p>{% endfor %}
+      </div>
+    </section>
+
+    <section class="panel audit">
+      <h2>Audit trail</h2>
+      <table>
+        <thead><tr><th>Time</th><th>Action</th><th>Entity</th><th>Details</th></tr></thead>
+        <tbody>
+        {% for event in state.audits %}
+          <tr><td>{{ event.occurred_at }}</td><td>{{ event.action }}</td><td>{{ event.entity_type }} #{{ event.entity_id }}</td><td><code>{{ event.details_json }}</code></td></tr>
+        {% else %}<tr><td colspan="4">No events yet.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>
